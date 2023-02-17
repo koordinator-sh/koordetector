@@ -1,0 +1,12 @@
+apiVersion: interference.koordinator.sh/v1alpha1
+kind: InterferenceDetectionRule
+metadata:
+  labels:
+    app.kubernetes.io/name: interferencedetectionrule
+    app.kubernetes.io/instance: interferencedetectionrule-sample
+    app.kubernetes.io/part-of: koordetector
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: koordetector
+  name: interferencedetectionrule-sample
+spec:
+  # TODO(user): Add fields here

@@ -1,0 +1,31 @@
+# permissions for end users to edit interferencemetriccheckpoints.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: interferencemetriccheckpoint-editor-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: koordetector
+    app.kubernetes.io/part-of: koordetector
+    app.kubernetes.io/managed-by: kustomize
+  name: interferencemetriccheckpoint-editor-role
+rules:
+- apiGroups:
+  - interference.koordinator.sh
+  resources:
+  - interferencemetriccheckpoints
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - interference.koordinator.sh
+  resources:
+  - interferencemetriccheckpoints/status
+  verbs:
+  - get

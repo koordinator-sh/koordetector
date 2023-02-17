@@ -1,0 +1,12 @@
+apiVersion: interference.koordinator.sh/v1alpha1
+kind: InterferenceMetricCheckpoint
+metadata:
+  labels:
+    app.kubernetes.io/name: interferencemetriccheckpoint
+    app.kubernetes.io/instance: interferencemetriccheckpoint-sample
+    app.kubernetes.io/part-of: koordetector
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: koordetector
+  name: interferencemetriccheckpoint-sample
+spec:
+  # TODO(user): Add fields here

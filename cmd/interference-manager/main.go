@@ -18,8 +18,6 @@ package main
 
 import (
 	"flag"
-	interferencev1alpha1 "github.com/koordinator-sh/koordetector/apis/interference/v1alpha1"
-	"github.com/koordinator-sh/koordetector/pkg/interferencemanager/controllers"
 	"os"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -33,6 +31,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	//+kubebuilder:scaffold:imports
+
+	interferencev1alpha1 "github.com/koordinator-sh/koordetector/apis/interference/v1alpha1"
+	"github.com/koordinator-sh/koordetector/pkg/interferencemanager/controllers"
 )
 
 var (

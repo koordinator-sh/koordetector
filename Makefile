@@ -10,6 +10,7 @@ REG_USER ?= ""
 REG_PWD ?= ""
 
 INTERFERENCE_MANAGER_IMG ?= "${REG}/${REG_NS}/interference-manager:${GIT_BRANCH}-${GIT_COMMIT_ID}"
+KOORDETECTOR_IMG ?= "${REG}/${REG_NS}/koordetector:${GIT_BRANCH}-${GIT_COMMIT_ID}"
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.22
@@ -59,7 +60,7 @@ manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and Cust
 
 .PHONY: generate
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
-	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
+	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate/boilerplate.go.txt" paths="./..."
 
 .PHONY: fmt
 fmt: ## Run go fmt against code.
@@ -91,25 +92,33 @@ fast-test: envtest ## Run tests fast.
 ##@ Build
 
 .PHONY: build
-build: build-interference-manager
+build: build-interference-manager build-koordetector
 
 .PHONY: build-interference-manager
 build-interference-manager:  ## Build interference-manager binary.
 	go build -o bin/interference-manager cmd/interference-manager/main.go
+
+.PHONY: build-koordetector
+build-koordetector:  ## Build koordetector binary.
+	go build -o bin/koordetector cmd/koordetector/main.go
 
 # If you wish built the manager image targeting other platforms you can use the --platform flag.
 # (i.e. docker build --platform linux/arm64 ). However, you must enable docker buildKit for it.
 # More info: https://docs.docker.com/develop/develop-images/build_enhancements/
 
 .PHONY: docker-build
-docker-build: test docker-build-interference-manager
+docker-build: test docker-build-interference-manager docker-build-koordetector
 
 .PHONY: docker-build-interference-manager
-docker-build-interference-manager: ## Build docker image with the koordlet.
+docker-build-interference-manager: ## Build docker image with the interference-manager.
 	docker build --pull -t ${INTERFERENCE_MANAGER_IMG} -f docker/interference-manager.dockerfile .
 
+.PHONY: docker-build-koordetector
+docker-build-koordetector: ## Build docker image with the koordetector.
+	docker build --pull -t ${KOORDETECTOR_IMG} -f docker/koordetector.dockerfile .
+
 .PHONY: docker-push
-docker-push: docker-push-interference-manager
+docker-push: docker-push-interference-manager docker-push-koordetector
 
 .PHONY: docker-push-interference-manager
 docker-push-interference-manager: ## Push docker image with the interference-manager.
@@ -117,6 +126,13 @@ ifneq ($(REG_USER), "")
 	docker login -u $(REG_USER) -p $(REG_PWD) ${REG}
 endif
 	docker push ${INTERFERENCE_MANAGER_IMG}
+
+.PHONY: docker-push-koordetector
+docker-push-koordetector: ## Push docker image with the koordetector.
+ifneq ($(REG_USER), "")
+	docker login -u $(REG_USER) -p $(REG_PWD) ${REG}
+endif
+	docker push ${KOORDETECTOR_IMG}
 
 ##@ Deployment
 

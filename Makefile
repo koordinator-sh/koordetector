@@ -17,6 +17,8 @@ ENVTEST_K8S_VERSION = 1.22
 # Set license header files.
 LICENSE_HEADER_GO ?= hack/boilerplate/boilerplate.go.txt
 
+PACKAGES ?= $(shell go list ./...)
+
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
 GOBIN=$(shell go env GOPATH)/bin
@@ -93,7 +95,7 @@ build: build-interference-manager
 
 .PHONY: build-interference-manager
 build-interference-manager:  ## Build interference-manager binary.
-	go build -o cmd/interference-manager main.go
+	go build -o bin/interference-manager cmd/interference-manager/main.go
 
 # If you wish built the manager image targeting other platforms you can use the --platform flag.
 # (i.e. docker build --platform linux/arm64 ). However, you must enable docker buildKit for it.

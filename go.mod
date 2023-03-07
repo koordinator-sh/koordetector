@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/k8stopologyawareschedwg/noderesourcetopology-api v0.1.1
 	github.com/koordinator-sh/koordinator v1.1.1-0.20230301120008-b66fbe0f57f0
-	github.com/onsi/ginkgo v1.16.4
+	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.23.0
 	github.com/prometheus/client_golang v1.14.0
 	k8s.io/apimachinery v0.26.0

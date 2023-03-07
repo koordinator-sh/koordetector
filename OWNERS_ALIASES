@@ -1,0 +1,9 @@
+# See the OWNERS_ALIASES docs at https://go.k8s.io/owners
+
+aliases:
+
+  ci-approvers:
+    - hormes
+    - FillZpp
+    - zwzhang0107
+

@@ -1,18 +1,36 @@
-package koordetector
+/*
+Copyright 2022 The Koordinator Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+package main
 
 import (
 	"flag"
+	"net/http"
+	"os"
+	"time"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/klog/v2"
+	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
+
 	"github.com/koordinator-sh/koordetector/cmd/koordetector/options"
 	"github.com/koordinator-sh/koordetector/pkg/features"
 	"github.com/koordinator-sh/koordetector/pkg/koordetector"
 	"github.com/koordinator-sh/koordetector/pkg/koordetector/config"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/klog/v2"
-	"net/http"
-	"os"
-	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
-	"time"
 )
 
 func init() {}
@@ -40,9 +58,8 @@ func main() {
 
 	stopCtx := signals.SetupSignalHandler()
 
-
 	// Get a config to talk to the apiserver
-	klog.Info("Setting up client for koordlet")
+	klog.Info("Setting up client for koordetector")
 	err := cfg.InitClient()
 	if err != nil {
 		klog.Error("Unable to setup client config: ", err)
@@ -51,7 +68,7 @@ func main() {
 
 	d, err := koordetector.NewDaemon(cfg)
 	if err != nil {
-		klog.Error("Unable to setup koordlet daemon: ", err)
+		klog.Error("Unable to setup koordetector daemon: ", err)
 		os.Exit(1)
 	}
 
@@ -64,6 +81,6 @@ func main() {
 	}()
 
 	// Start the Cmd
-	klog.Info("Starting the koordlet daemon")
+	klog.Info("Starting the koordetector daemon")
 	d.Run(stopCtx.Done())
 }

@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/k8stopologyawareschedwg/noderesourcetopology-api v0.1.1
-	github.com/koordinator-sh/koordinator v1.1.1-0.20230301120008-b66fbe0f57f0
+	github.com/koordinator-sh/koordinator v1.1.1
 	github.com/prometheus/client_golang v1.14.0
 	github.com/prometheus/common v0.37.0
 	go.uber.org/atomic v1.10.0
@@ -101,7 +101,6 @@ require (
 	github.com/opencontainers/runc v1.0.2 // indirect
 	github.com/opencontainers/runtime-spec v1.0.3-0.20210326190908-1c3f411f0417 // indirect
 	github.com/opencontainers/selinux v1.8.2 // indirect
-	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pelletier/go-toml/v2 v2.0.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect

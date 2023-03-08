@@ -6,6 +6,7 @@ require (
 	github.com/k8stopologyawareschedwg/noderesourcetopology-api v0.1.1
 	github.com/koordinator-sh/koordinator v1.1.1-0.20230301120008-b66fbe0f57f0
 	github.com/prometheus/client_golang v1.14.0
+	github.com/prometheus/common v0.37.0
 	go.uber.org/atomic v1.10.0
 	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8
 	k8s.io/api v0.26.0
@@ -105,7 +106,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.3.0 // indirect
-	github.com/prometheus/common v0.37.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/seccomp/libseccomp-golang v0.9.1 // indirect

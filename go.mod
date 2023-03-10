@@ -3,11 +3,14 @@ module github.com/koordinator-sh/koordetector
 go 1.17
 
 require (
+	github.com/cilium/ebpf v0.8.1
 	github.com/k8stopologyawareschedwg/noderesourcetopology-api v0.1.1
 	github.com/koordinator-sh/koordinator v1.1.1-0.20230301120008-b66fbe0f57f0
 	github.com/prometheus/client_golang v1.14.0
 	github.com/prometheus/common v0.37.0
 	go.uber.org/atomic v1.10.0
+	go.uber.org/multierr v1.6.0
+	golang.org/x/sys v0.3.0
 	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8
 	k8s.io/api v0.26.0
 	k8s.io/apimachinery v0.26.0
@@ -40,7 +43,6 @@ require (
 	github.com/cakturk/go-netstat v0.0.0-20200220111822-e5b49efee7a5 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/checkpoint-restore/go-criu/v5 v5.0.0 // indirect
-	github.com/cilium/ebpf v0.6.2 // indirect
 	github.com/containerd/console v1.0.2 // indirect
 	github.com/containerd/containerd v1.5.10 // indirect
 	github.com/containerd/ttrpc v1.1.0 // indirect
@@ -121,12 +123,10 @@ require (
 	go.etcd.io/etcd/client/pkg/v3 v3.5.5 // indirect
 	go.etcd.io/etcd/client/v3 v3.5.5 // indirect
 	go.uber.org/goleak v1.2.0 // indirect
-	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.19.0 // indirect
 	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/net v0.3.1-0.20221206200815-1e63c2f08a10 // indirect
 	golang.org/x/oauth2 v0.0.0-20220223155221-ee480838109b // indirect
-	golang.org/x/sys v0.3.0 // indirect
 	golang.org/x/term v0.3.0 // indirect
 	golang.org/x/text v0.5.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
@@ -156,6 +156,7 @@ require (
 )
 
 replace (
+	github.com/cilium/ebpf => github.com/cilium/ebpf v0.8.1
 	github.com/go-logr/logr => github.com/go-logr/logr v0.4.0
 	github.com/go-logr/zapr => github.com/go-logr/zapr v0.4.0
 	github.com/google/cadvisor => github.com/koordinator-sh/cadvisor v0.0.0-20220919031936-833eb74e858e
@@ -199,6 +200,7 @@ replace (
 	k8s.io/mount-utils => k8s.io/mount-utils v0.22.6
 	k8s.io/pod-security-admission => k8s.io/pod-security-admission v0.22.6
 	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.22.6
+	sigs.k8s.io/controller-runtime v0.10.3 => sigs.k8s.io/controller-runtime v0.10.3
 	sigs.k8s.io/descheduler => sigs.k8s.io/descheduler v0.26.1-0.20230216092500-02b1e8b8b9c1
 	sigs.k8s.io/scheduler-plugins => sigs.k8s.io/scheduler-plugins v0.22.6
 )

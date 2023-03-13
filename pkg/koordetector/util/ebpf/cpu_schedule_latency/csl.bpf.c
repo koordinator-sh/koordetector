@@ -3,7 +3,7 @@
 #include "bpf_core_read.h"
 
 #define TASK_RUNNING 0
-#define MAX_CGROUP_NAME_SIZE 70
+#define MAX_CGROUP_NAME_SIZE 128
 
 struct {
 	__uint(type, BPF_MAP_TYPE_HASH);
@@ -89,6 +89,7 @@ int handle_switch(struct sched_switch_tp_args *ctx)
     struct kernfs_node *kn;
     char *cgroup_name;
 	char cgroup_name_array[MAX_CGROUP_NAME_SIZE];
+	long name_len;
 
     bpf_core_read(&cgroups, sizeof(cgroups), &task->cgroups);
     bpf_core_read(&subsys, sizeof(subsys), &cgroups->subsys);
@@ -97,10 +98,9 @@ int handle_switch(struct sched_switch_tp_args *ctx)
     bpf_core_read(&cgroup_name,sizeof(cgroup_name),&kn->name);
     if (!cgroup_name)
         return 0;
-    bpf_core_read_str(cgroup_name_array, sizeof(cgroup_name_array), cgroup_name);
-
-    bpf_printk("cgroup_name is %s", cgroup_name);
-    bpf_printk("cgroup_name_array is %s", cgroup_name_array);
+    name_len = bpf_core_read_str(&cgroup_name_array, MAX_CGROUP_NAME_SIZE, cgroup_name);
+    if (name_len < 0)
+        return 0;
 
 	u32 pid = ctx->next_pid;
 	long int prev_state;

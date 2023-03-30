@@ -9,7 +9,7 @@ require (
 	github.com/prometheus/client_golang v1.14.0
 	github.com/prometheus/common v0.37.0
 	go.uber.org/atomic v1.10.0
-	go.uber.org/multierr v1.6.0
+	go.uber.org/multierr v1.11.0
 	golang.org/x/sys v0.3.0
 	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8
 	k8s.io/api v0.26.0

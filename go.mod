@@ -8,7 +8,7 @@ require (
 	github.com/koordinator-sh/koordinator v1.1.1-0.20230301120008-b66fbe0f57f0
 	github.com/prometheus/client_golang v1.14.0
 	github.com/prometheus/common v0.37.0
-	go.uber.org/atomic v1.10.0
+	go.uber.org/atomic v1.11.0
 	go.uber.org/multierr v1.6.0
 	golang.org/x/sys v0.3.0
 	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8

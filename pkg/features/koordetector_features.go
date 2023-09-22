@@ -21,6 +21,14 @@ import (
 	"k8s.io/component-base/featuregate"
 )
 
+const (
+	// owner: @songtao98 @zwzhang0107
+	// alpha: v1.0
+	//
+	// CSLCollector enables cpu schedule latency collector feature of koordetector.
+	CSLCollector featuregate.Feature = "CSLCollector"
+)
+
 func init() {
 	runtime.Must(DefaultMutableKoordetectorFeatureGate.Add(defaultKoordetectorFeatureGates))
 }
@@ -29,5 +37,7 @@ var (
 	DefaultMutableKoordetectorFeatureGate featuregate.MutableFeatureGate = featuregate.NewFeatureGate()
 	DefaultKoordetectorFeatureGate        featuregate.FeatureGate        = DefaultMutableKoordetectorFeatureGate
 
-	defaultKoordetectorFeatureGates = map[featuregate.Feature]featuregate.FeatureSpec{}
+	defaultKoordetectorFeatureGates = map[featuregate.Feature]featuregate.FeatureSpec{
+		CSLCollector: {Default: false, PreRelease: featuregate.Alpha},
+	}
 )

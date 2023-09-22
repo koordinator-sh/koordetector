@@ -20,25 +20,36 @@ import (
 	"flag"
 	"strings"
 
+	"github.com/koordinator-sh/koordinator/pkg/koordlet/util/system"
 	"k8s.io/client-go/rest"
 	cliflag "k8s.io/component-base/cli/flag"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 
 	"github.com/koordinator-sh/koordetector/pkg/features"
+	maframework "github.com/koordinator-sh/koordetector/pkg/koordetector/metricsadvisor/framework"
+	"github.com/koordinator-sh/koordetector/pkg/koordetector/statesinformer"
 )
 
 type Configuration struct {
-	KubeRestConf *rest.Config
-	FeatureGates map[string]bool
+	KubeRestConf       *rest.Config
+	FeatureGates       map[string]bool
+	StatesInformerConf *statesinformer.Config
+	CollectorConf      *maframework.Config
 }
 
 func NewConfiguration() *Configuration {
-	return &Configuration{}
+	return &Configuration{
+		StatesInformerConf: statesinformer.NewDefaultConfig(),
+		CollectorConf:      maframework.NewDefaultConfig(),
+	}
 }
 
 func (c *Configuration) InitFlags(fs *flag.FlagSet) {
 	fs.Var(cliflag.NewMapStringBool(&c.FeatureGates), "feature-gates", "A set of key=value pairs that describe feature gates for alpha/experimental features. "+
 		"Options are:\n"+strings.Join(features.DefaultKoordetectorFeatureGate.KnownFeatures(), "\n"))
+	system.Conf.InitFlags(fs)
+	c.StatesInformerConf.InitFlags(fs)
+	c.CollectorConf.InitFlags(fs)
 }
 
 func (c *Configuration) InitClient() error {

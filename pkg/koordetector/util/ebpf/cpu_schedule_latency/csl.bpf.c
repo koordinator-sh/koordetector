@@ -6,8 +6,8 @@
 #define MAX_CGROUP_NAME_SIZE 128
 
 struct {
-	__uint(type, BPF_MAP_TYPE_HASH);
-	__uint(max_entries, 10240);
+	__uint(type, BPF_MAP_TYPE_LRU_HASH);
+	__uint(max_entries, 65536);
 	__type(key, u32);
 	__type(value, u64);
 } pid_start_time SEC(".maps");

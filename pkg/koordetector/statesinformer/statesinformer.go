@@ -89,6 +89,7 @@ func NewStatesInformer(config *Config, kubeClient clientset.Interface, nodeName 
 	}
 	stat := &pluginState{
 		informerPlugins: map[pluginName]informerPlugin{},
+		callbackRunner:  NewCallbackRunner(),
 	}
 	s := &statesInformer{
 		config: config,
@@ -97,6 +98,7 @@ func NewStatesInformer(config *Config, kubeClient clientset.Interface, nodeName 
 		states:  stat,
 		started: atomic.NewBool(false),
 	}
+	s.initInformerPlugins()
 	return s
 }
 
@@ -112,6 +114,8 @@ func (s *statesInformer) Run(stopCh <-chan struct{}) error {
 	klog.V(2).Infof("setup statesInformer")
 
 	klog.V(2).Infof("starting callback runner")
+	s.states.callbackRunner.Setup(s)
+	go s.states.callbackRunner.Start(stopCh)
 
 	klog.V(2).Infof("starting informer plugins")
 	s.setupPlugins()

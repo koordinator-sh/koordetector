@@ -17,10 +17,14 @@ limitations under the License.
 package cpu_schedule_latency
 
 import (
+	"debug/elf"
 	"fmt"
+	"os"
 
+	"github.com/cilium/ebpf"
 	"github.com/cilium/ebpf/link"
 	"github.com/cilium/ebpf/rlimit"
+	"github.com/docker/docker/pkg/parsers/kernel"
 	"go.uber.org/multierr"
 	"golang.org/x/sys/unix"
 )
@@ -30,17 +34,38 @@ import (
 
 type ProgObjects struct {
 	Objs        *bpfObjects
+	vmlinux     *os.File
 	tracepoints []*link.Link
 }
 
-func NewCSLeBPFProg() (*ProgObjects, error) {
+func NewCSLeBPFProg(bpfSupported bool) (*ProgObjects, error) {
 	// Allow the current process to lock memory for eBPF resources.
 	if err := rlimit.RemoveMemlock(); err != nil {
 		return nil, fmt.Errorf("lock memory error: %v", err)
 	}
+	var (
+		opt         *ebpf.CollectionOptions
+		vmlinuxFile *os.File
+	)
+	if !bpfSupported {
+		// Use external vmlinux for kernels without /sys/kernel/btf/vmlinux
+		kernelVersion, err := kernel.GetKernelVersion()
+		if err != nil {
+			return nil, fmt.Errorf("get kernel verision err: %v", err)
+		}
+		vmlinuxFile, err = os.Open("vmlinux-" + kernelVersion.String())
+		if err != nil {
+			return nil, fmt.Errorf("open vmlinux failed: %v", err)
+		}
+		opt, err = getProgOpts(vmlinuxFile)
+		if err != nil {
+			return nil, fmt.Errorf("get prog options failed: %v", err)
+		}
+
+	}
 	// Load pre-compiled programs and maps into the kernel.
 	objs := bpfObjects{}
-	if err := loadBpfObjects(&objs, nil); err != nil {
+	if err := loadBpfObjects(&objs, opt); err != nil {
 		return nil, fmt.Errorf("load bpf objects error: %v", err)
 	}
 	tpWakeup, err := link.Tracepoint("sched", "sched_wakeup", objs.HandleSchedWakeup)
@@ -57,7 +82,8 @@ func NewCSLeBPFProg() (*ProgObjects, error) {
 	}
 
 	return &ProgObjects{
-		Objs: &objs,
+		Objs:    &objs,
+		vmlinux: vmlinuxFile,
 		tracepoints: []*link.Link{
 			&tpWakeup,
 			&tpWakeupNew,
@@ -66,7 +92,38 @@ func NewCSLeBPFProg() (*ProgObjects, error) {
 	}, nil
 }
 
+func getProgOpts(vmlinuxFile *os.File) (*ebpf.CollectionOptions, error) {
+	btfElf, err := elf.NewFile(vmlinuxFile)
+	if err != nil {
+		return nil, fmt.Errorf("read bare elf failed: %v", err)
+	}
+	var btfSection *elf.Section
+	for _, sec := range btfElf.Sections {
+		switch sec.Name {
+		case ".BTF":
+			btfSection = sec
+		default:
+		}
+	}
+	if btfSection == nil {
+		return nil, fmt.Errorf("read bare elf: no .BTF section")
+	}
+	if btfSection.ReaderAt == nil {
+		return nil, fmt.Errorf("compressed BTF is not supported")
+	}
+	opt := &ebpf.CollectionOptions{
+		Programs: ebpf.ProgramOptions{
+			TargetBTF: btfSection.ReaderAt,
+		},
+	}
+	return opt, nil
+}
+
 func (p *ProgObjects) DestroyEBPFProg() (err error) {
+	if p.vmlinux != nil {
+		fileCloseErr := p.vmlinux.Close()
+		err = multierr.Append(err, fileCloseErr)
+	}
 	for _, tracepoint := range p.tracepoints {
 		newErr := (*tracepoint).Close()
 		err = multierr.Append(err, newErr)
@@ -99,7 +156,7 @@ func (p *ProgObjects) GetCgroupScheduleLatencyAvg(cgroupNames []string) (map[str
 		}
 	}
 	err := delayIterator.Err()
-	counterIterator := p.Objs.OutputCgroupDelay.Iterate()
+	counterIterator := p.Objs.OutputCgroupCounter.Iterate()
 	for counterIterator.Next(&cgroupNameArray, &counter) {
 		nameFromKernel := unix.ByteSliceToString(cgroupNameArray)
 		// filter cgroup name directly from cgroupComputationMap
@@ -107,6 +164,7 @@ func (p *ProgObjects) GetCgroupScheduleLatencyAvg(cgroupNames []string) (map[str
 		// make array[1] which is counter zero
 		if array, ok := cgroupComputationMap[nameFromKernel]; ok {
 			array[1] = counter
+			cgroupComputationMap[nameFromKernel] = array
 		}
 	}
 	for name, array := range cgroupComputationMap {

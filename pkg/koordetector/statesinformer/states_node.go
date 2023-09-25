@@ -22,9 +22,6 @@ import (
 	"sync"
 	"time"
 
-	apiext "github.com/koordinator-sh/koordinator/apis/extension"
-	"github.com/koordinator-sh/koordinator/pkg/koordlet/metrics"
-	"github.com/koordinator-sh/koordinator/pkg/util"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiruntime "k8s.io/apimachinery/pkg/runtime"
@@ -32,6 +29,8 @@ import (
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
+
+	"github.com/koordinator-sh/koordetector/pkg/koordetector/metrics"
 )
 
 const (
@@ -153,34 +152,6 @@ func (s *nodeInformer) syncNode(newNode *corev1.Node) {
 	defer s.nodeRWMutex.Unlock()
 	s.node = newNode.DeepCopy()
 
-	// also register node for metrics
-	recordNodeResourceMetrics(newNode)
-}
-
-func recordNodeResourceMetrics(node *corev1.Node) {
 	// register node labels
-	metrics.Register(node)
-	// record node resource metrics
-	recordNodeResources(node)
-
-	klog.V(5).Info("record node prometheus metrics successfully")
-}
-
-func recordNodeResources(node *corev1.Node) {
-	if node == nil || node.Status.Allocatable == nil {
-		klog.V(4).Infof("failed to record node resources metrics, node is invalid: %v", node)
-		return
-	}
-
-	// record node allocatable of BatchCPU & BatchMemory
-	if q, ok := node.Status.Allocatable[apiext.BatchCPU]; ok {
-		metrics.RecordNodeResourceAllocatable(string(apiext.BatchCPU), float64(util.QuantityPtr(q).Value()))
-	} else {
-		metrics.RecordNodeResourceAllocatable(string(apiext.BatchCPU), 0)
-	}
-	if q, ok := node.Status.Allocatable[apiext.BatchMemory]; ok {
-		metrics.RecordNodeResourceAllocatable(string(apiext.BatchMemory), float64(util.QuantityPtr(q).Value()))
-	} else {
-		metrics.RecordNodeResourceAllocatable(string(apiext.BatchMemory), 0)
-	}
+	metrics.Register(newNode)
 }

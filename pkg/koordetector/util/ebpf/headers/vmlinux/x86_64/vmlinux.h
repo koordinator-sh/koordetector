@@ -1,1 +1,1 @@
-./vmlinux_514.h
+vmlinux_510_alinux.h

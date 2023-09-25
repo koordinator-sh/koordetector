@@ -1,1 +1,3 @@
 vendor
+pkg/koordetector/util/cpu_schedule_latency/bpf_bpfeb.go
+pkg/koordetector/util/cpu_schedule_latency/bpf_bpfel.go
